@@ -41,6 +41,12 @@ async function run() {
         res.send(result)
     })
 
+    app.get("/highestCamp", async(req, res)=>{
+        const topParticipantCamp = campCollection.find().sort({participant_count:-1}).limit(6)
+        const result = await topParticipantCamp.toArray()
+        res.send(result)
+    })
+
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
     // Ensures that the client will close when you finish/error
