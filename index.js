@@ -32,9 +32,21 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
 
+    const userCollection = client.db("MCMS").collection("user")
     const campCollection = client.db("MCMS").collection("camps")
 
 
+    app.post('/users', async (req, res)=>{
+      const user = req.body
+      const query = {email: user.email}
+      const exitingUser = await userCollection.findOne(query)
+      if(exitingUser){
+        return res.send({message: "user already exist", insertedID: null})
+
+      }
+      const result = await userCollection.insertOne(user)
+      res.send(result)
+    })
 
     app.get("/camp", async(req, res)=>{
         const result = await campCollection.find().toArray()
