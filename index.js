@@ -56,8 +56,19 @@ async function run() {
       })
      }
 
+     const verifyAdmin = async(req, res, next) =>{
+      const email = req.decoded.email;
+      const query = {email: email}
+      const user = await userCollection.findOne(query)
+      const isAdmin = user?.role === 'admin'
+      if(!isAdmin){
+        return res.status(403).send({message: 'forbidden access'})
+      }
+      next()
+     }
 
-    app.post('/users', async (req, res)=>{
+
+    app.post('/users', verifyToken, verifyAdmin async (req, res)=>{
       const user = req.body
       const query = {email: user.email}
       const exitingUser = await userCollection.findOne(query)
@@ -70,7 +81,7 @@ async function run() {
     })
 
 
-    app.get('/users/admin/:email', async(req, res)=>{
+    app.get('/users/admin/:email', verifyToken, verifyAdmin async(req, res)=>{
       const email = req.params.email;
       if(email !== req.decoded.email){
         return res.status(403).send({message: 'forbidden Access'})
