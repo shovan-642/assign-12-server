@@ -42,6 +42,21 @@ async function run() {
     })
 
 
+     cosnt verifyToken = (req, res, next)=>{
+      if(!req.headers.authorization){
+        return res.status(401).send({message: "unauthorized Access"})
+      }
+      const token = req.headers.authorization.split(' ')[1];
+      jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded)=>{
+        if(err){
+          return res.status(401).send({message: "unauthorized access"})
+        }
+        req.decoded = decoded
+        next()
+      })
+     }
+
+
     app.post('/users', async (req, res)=>{
       const user = req.body
       const query = {email: user.email}
@@ -53,6 +68,23 @@ async function run() {
       const result = await userCollection.insertOne(user)
       res.send(result)
     })
+
+
+    app.get('/users/admin/:email', async(req, res)=>{
+      const email = req.params.email;
+      if(email !== req.decoded.email){
+        return res.status(403).send({message: 'forbidden Access'})
+      }
+      const query = {email: email}
+      const user  = await userCollection.findOne(query)
+      let admin = false
+      if(user){
+        admin = user?.role === 'admin'
+      }
+      res.send({admin})
+
+    })
+
 
     app.get("/camp", async(req, res)=>{
         const result = await campCollection.find().toArray()
