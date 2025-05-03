@@ -12,10 +12,6 @@ const port = process.env.PORT || 5000;
 app.use(cors())
 app.use(express.json())
 
-// assignment-12
-// YQt$e!A~63x2QNv
-
-
 
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@assignment-10.9gvo9.mongodb.net/?retryWrites=true&w=majority&appName=assignment-10`;
@@ -34,6 +30,16 @@ async function run() {
 
     const userCollection = client.db("MCMS").collection("user")
     const campCollection = client.db("MCMS").collection("camps")
+
+
+
+    // jwt token
+
+    app.post('/jwt', async(req, res)=>{
+      const user = req.body;
+      const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {expiresIn: '1h'})
+      res.send({token})
+    })
 
 
     app.post('/users', async (req, res)=>{
