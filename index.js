@@ -80,6 +80,13 @@ async function run() {
       res.send(result)
     })
 
+    app.post('/add-camp', verifyToken, verifyAdmin, async(req, res)=>{
+      const item = req.body
+      const result =  await campCollection.insertOne(item)
+      res.send(result)
+
+    })
+
 
     app.get('/users/admin/:email', verifyToken, verifyAdmin, async(req, res)=>{
       const email = req.params.email;
