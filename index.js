@@ -37,7 +37,7 @@ async function run() {
 
     app.post('/jwt', async(req, res)=>{
       const user = req.body;
-      const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {expiresIn: '1h'})
+      const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {expiresIn: '5h'})
       res.send({token})
     })
 
@@ -112,6 +112,31 @@ async function run() {
       const id = req.params.campId
       const query = {_id: new ObjectId(id)}
       const result =  await campCollection.findOne(query)
+      res.send(result)
+    })
+    app.get("/update-camp/:campId", async(req, res)=>{
+      const id = req.params.campId
+      const query = {_id: new ObjectId(id)}
+      const result =  await campCollection.findOne(query)
+      res.send(result)
+    })
+
+    app.patch("/update-camp/:campId", verifyToken, verifyAdmin, async(req, res)=>{
+      const camp = req.body
+      const id = req.params.campId
+      const filter = {_id: new ObjectId(id)}
+      const updateCamp = {
+        $set: {
+          camp_name : camp.camp_name,
+          image : camp.image,
+          camp_fees : camp.camp_fees,
+          date_time : camp.date_time,
+          location : camp.location,
+          healthcare_professional_name : camp.healthcare_professional_name,
+          description : camp.description,
+        }
+      }
+      const result = await campCollection.updateOne(filter, updateCamp)
       res.send(result)
     })
 
