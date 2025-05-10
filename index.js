@@ -30,6 +30,7 @@ async function run() {
 
     const userCollection = client.db("MCMS").collection("user")
     const campCollection = client.db("MCMS").collection("camps")
+    const regCampCollection = client.db("MCMS").collection("registered-camps")
 
 
 
@@ -85,6 +86,11 @@ async function run() {
       const result =  await campCollection.insertOne(item)
       res.send(result)
 
+    })
+    app.post('/registered-camp', verifyToken, async(req, res)=>{
+      const item = req.body
+      const result =  await regCampCollection.insertOne(item)
+      res.send(result)
     })
 
 
