@@ -115,6 +115,13 @@ async function run() {
       res.send(result)
     })
 
+    app.delete("/delete-camp/:campId", verifyToken, verifyAdmin, async(req, res)=>{
+      const id = req.params.campId
+      const query = {_id: new ObjectId(id)}
+      const result = await campCollection.deleteOne(query)
+      res.send(result)
+    })
+
     app.get("/highestCamp", async(req, res)=>{
         const topParticipantCamp = campCollection.find().sort({participant_count:-1}).limit(6)
         const result = await topParticipantCamp.toArray()
