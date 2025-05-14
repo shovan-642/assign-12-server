@@ -87,10 +87,24 @@ async function run() {
       res.send(result)
 
     })
-    app.post('/registered-camp', verifyToken, async(req, res)=>{
+    app.post('/registered-camp', async(req, res)=>{
       const item = req.body
       const result =  await regCampCollection.insertOne(item)
+      await campCollection.updateOne(
+        {_id: new ObjectId(item.camp_id)},
+        {$inc: {participant_count: 1}}
+      )
       res.send(result)
+    })
+
+    app.get("/registered-camp/:email", verifyToken, async(req, res)=>{
+      const email = req.params.email
+      if(email !== req.decoded.email){
+        return res.status(403).send ({message: "forbidden access"})
+      }
+      const query = {participant_email: email}
+      const result = await regCampCollection.find(query).toArray()
+        res.send(result)
     })
 
 
@@ -120,7 +134,7 @@ async function run() {
       const result =  await campCollection.findOne(query)
       res.send(result)
     })
-    app.get("/update-camp/:campId", async(req, res)=>{
+    app.get("/update-camp/:campId", verifyToken, verifyAdmin, async(req, res)=>{
       const id = req.params.campId
       const query = {_id: new ObjectId(id)}
       const result =  await campCollection.findOne(query)
